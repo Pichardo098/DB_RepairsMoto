@@ -1,4 +1,5 @@
 const { body, validationResult } = require("express-validator");
+const { User } = require("../models/user.model");
 
 const validateFields = (req, res, next) => {
   const errors = validationResult(req);
@@ -19,14 +20,43 @@ exports.createUserValidation = [
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
-    .withMessage("The format has to be a email"),
+    .withMessage("The format has to be a email")
+    .custom(
+      async (value) => {
+        const email = await User.findOne({
+          where: {
+            email: value,
+          },
+        });
+        if (email) {
+          throw new Error(`Email ${value} already exists`);
+        }
+      }
+      // User.findOne({ where: { email: value } }).then((email) => {
+      //   if (email) {
+      //     return Promise.reject(`Email ${value} already exists`);
+      //   }
+      // })
+
+      // return User.findOne({
+      //   where: {
+      //     email: value,
+      //   },
+      // }).then((email) => {
+      //   if (email) {
+      //     return Promise.reject(`Email ${value} already exists`);
+      //   }
+      // });
+    ),
   body("password")
     .notEmpty()
     .withMessage("Password is required")
     .isLength({ min: 8 })
     .withMessage("Password must have a least 8 characters")
     .matches(/[a-zA-z]/)
-    .withMessage("Password must have contain a least one letter"),
+    .withMessage("Password must have contain a least one letter")
+    .matches(/[0-9]/)
+    .withMessage("Password must contain at least one number"),
   validateFields,
 ];
 
@@ -41,7 +71,9 @@ exports.updateUserValidation = [
     .isLength({ min: 8 })
     .withMessage("Password must have a least 8 characters")
     .matches(/[a-zA-z]/)
-    .withMessage("Password must have contain a least one letter"),
+    .withMessage("Password must have contain a least one letter")
+    .matches(/[0-9]/)
+    .withMessage("Password must contain at least one number"),
   validateFields,
 ];
 
