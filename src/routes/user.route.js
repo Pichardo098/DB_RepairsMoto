@@ -1,22 +1,41 @@
 const express = require("express");
 const router = express.Router();
+
+//Controllers
 const userController = require("../controllers/user.controller");
-//Get_ todos los usuarios
-//Post - Crear un nuevo usuario
+
+//Middlewares
+const userMiddleware = require("../middlewares/user.middleware");
+const validationMiddlewares = require("../middlewares/validation.middleware");
+const authMiddleware = require("../middlewares/auth.middleware");
 
 router
   .route("/")
   .get(userController.findAllUsers)
-  .post(userController.createUser);
+  .post(validationMiddlewares.createUserValidation, userController.createUser);
 
-//Get - Obtener solo un usuario
-//Patch- Actualizar Solo name y email
-//Delete -Deshabilitar la cuenta
+router.post(
+  "/login",
+  validationMiddlewares.loginUserValidation,
+  userMiddleware.validLoginUser,
+  userController.login
+);
+
+router.use(authMiddleware.protect);
 
 router
   .route("/:id")
-  .get(userController.findOneUser)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+  .get(userMiddleware.validUser, userController.findOneUser)
+  .patch(
+    validationMiddlewares.updateUserValidation,
+    userMiddleware.validUser,
+    authMiddleware.protectAccountOwner,
+    userController.updateUser
+  )
+  .delete(
+    userMiddleware.validUser,
+    authMiddleware.protectAccountOwner,
+    userController.deleteUser
+  );
 
 module.exports = router;

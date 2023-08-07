@@ -32,4 +32,12 @@ const User = db.define("users", {
   },
 });
 
-module.exports = User;
+const userStatus = Object.freeze({
+  active: "available",
+  disabled: "unavailable",
+});
+
+module.exports = {
+  User,
+  userStatus,
+};

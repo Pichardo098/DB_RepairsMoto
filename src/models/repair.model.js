@@ -12,6 +12,14 @@ const Repair = db.define("repairs", {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  motorsNumber: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  description: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   status: {
     type: DataTypes.ENUM("pending", "completed", "cancelled"),
     defaultValue: "pending",
@@ -23,4 +31,13 @@ const Repair = db.define("repairs", {
   },
 });
 
-module.exports = Repair;
+const repairStatus = Object.freeze({
+  pending: "pending",
+  completed: "completed",
+  cancelled: "cancelled",
+});
+
+module.exports = {
+  Repair,
+  repairStatus,
+};
