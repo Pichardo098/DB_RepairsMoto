@@ -25,7 +25,11 @@ router.use(authMiddleware.protect);
 
 router
   .route("/:id")
-  .get(userMiddleware.validUser, userController.findOneUser)
+  .get(
+    authMiddleware.allowTo("employee"),
+    userMiddleware.validUser,
+    userController.findOneUser
+  )
   .patch(
     validationMiddlewares.updateUserValidation,
     userMiddleware.validUser,

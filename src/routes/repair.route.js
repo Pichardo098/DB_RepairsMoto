@@ -10,6 +10,8 @@ const authMiddleware = require("../middlewares/auth.middleware");
 
 router.use(authMiddleware.protect);
 
+router.get("/myrepairs/", repairController.findMyRepairs);
+
 router.post(
   "/",
   validationMiddleware.createRepairValidation,

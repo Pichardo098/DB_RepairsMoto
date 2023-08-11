@@ -88,7 +88,6 @@ exports.loginUserValidation = [
 ];
 
 exports.createRepairValidation = [
-  body("date").notEmpty().withMessage("Date is required"),
   body("motorsNumber").notEmpty().withMessage("Motor number is required"),
   body("description").notEmpty().withMessage("Description is required"),
   validateFields,

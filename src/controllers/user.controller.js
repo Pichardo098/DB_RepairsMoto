@@ -121,14 +121,10 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
   const userDelete = await user.update({
     status: userStatus.disabled,
-    attributes: {
-      exclude: ["password"],
-    },
   });
 
   return res.status(200).json({
     status: "success",
-    message: `User with id ${userDelete.id} deleted successfully`,
-    result: userDelete,
+    message: `User with id ${userDelete.id} has beeen deleted successfully`,
   });
 });

@@ -1,12 +1,25 @@
-const { Repair } = require("../models/repair.model");
+const { Repair, repairStatus } = require("../models/repair.model");
+const { User } = require("../models/user.model");
 const catchAsync = require("../utils/catchAsync");
+const { Op } = require("sequelize");
 
 //?Find all repairs with status pending - method GET
 exports.findAllRepairs = catchAsync(async (req, res, next) => {
   const repairs = await Repair.findAll({
     where: {
-      status: "pending",
+      [Op.or]: [
+        { status: repairStatus.pending },
+        { status: repairStatus.completed },
+      ],
     },
+    include: [
+      {
+        model: User,
+        attributes: {
+          exclude: ["password"],
+        },
+      },
+    ],
   });
   return res.status(200).json({
     status: "succes",
@@ -18,9 +31,9 @@ exports.findAllRepairs = catchAsync(async (req, res, next) => {
 //?Create repair - method POST
 exports.createRepair = catchAsync(async (req, res, next) => {
   const { id: userId } = req.sessionUser;
-  const { date, motorsNumber, description } = req.body;
+  const { motorsNumber, description } = req.body;
   const repair = await Repair.create({
-    date,
+    date: new Date(),
     userId,
     motorsNumber,
     description,
@@ -76,5 +89,22 @@ exports.deleteRepair = catchAsync(async (req, res, next) => {
     status: "succes",
     message: `Repair with id ${repairDelete.id} cancelled successfully`,
     result: repairDelete,
+  });
+});
+
+//?Find my repairs
+exports.findMyRepairs = catchAsync(async (req, res, next) => {
+  const { id: userId } = req.sessionUser;
+
+  const repairs = await Repair.findAll({
+    where: {
+      userId: userId,
+    },
+  });
+
+  return res.status(200).json({
+    status: "success",
+    results: repairs.length,
+    repairs,
   });
 });
